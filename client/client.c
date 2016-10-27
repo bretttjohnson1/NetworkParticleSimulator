@@ -62,13 +62,13 @@ void moveandrotate(){
 void client_init(int argc, char **argv){
    if(argc>1){
       if(strcmp(argv[1],"-h")==0){
-         printf("client usage\n./client <server_adress> <port>\n\nTo stream an mp3 file run the server as ./server file.mp3\nthen run the client as ./client <server_adress> <port> | mpg123 -\n");
+         printf("client usage\n./run_client <server_adress> <port>\n");
          exit(0);
       }
    }
 
    if(argc !=3){
-      printf("missing args\nRun ./client -h for help\n");
+      printf("missing args\nRun ./run_client -h for help\n");
       exit(1);
    }
    char *address = argv[1];

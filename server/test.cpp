@@ -7,13 +7,12 @@
 //#include <muParserBase.h>
 #include "Particle.hpp"
 #include "Cluster.hpp"
-#include "window.hpp"
+#include "server.hpp"
 #include <vector>
 #include <math.h>
 #include <fstream>
 #include "globals.hpp"
 using namespace std;
-//using namespace mu;
 double xsize,ysize,zsize;
 int particles;
 int clustervalx=10;
@@ -132,25 +131,20 @@ int main(int args, char **args1){
   initz.DefineFun("rand",mrand);
   */
    srand(time(NULL));
-  for(int a = 0; a<clustervalx;a++){
-    for(int b = 0;b<clustervaly;b++){
-      for(int c =0;c<clustervalz;c++){
-	clusters[a*clustervaly*clustervalz+b*clustervalz+c]= Cluster(a*xsize/clustervalx,b*ysize/clustervaly,c*zsize/clustervalz,a*xsize/clustervalx+xsize/clustervalx,b*ysize/clustervaly+ysize/clustervalz,c*zsize/clustervalz+zsize/clustervalz);
-	for(int d = 0;d<1;d++){
-	  x=((double)a)*xsize/((double)clustervalx)+((double)rand())/((double)RAND_MAX)*xsize/((double)clustervalx)-xsize/2;
-	  y=((double)b)*ysize/((double)clustervaly)+((double)rand())/((double)RAND_MAX)*ysize/((double)clustervaly)-ysize/2;
-	  z=((double)c)*zsize/((double)clustervalz)+((double)rand())/((double)RAND_MAX)*zsize/((double)clustervalx)-zsize/2;
-	  clusters[a*clustervaly*clustervalz+b*clustervalz+c].
-
-	    particles.push_back(Particle(x+xsize/2,y+ysize/2,z+zsize/2
-					 ,0
-					 ,0
-					 ,0));
-	}
+   for(int a = 0; a<clustervalx;a++){
+      for(int b = 0;b<clustervaly;b++){
+         for(int c =0;c<clustervalz;c++){
+	         clusters[a*clustervaly*clustervalz+b*clustervalz+c]= Cluster(a*xsize/clustervalx,b*ysize/clustervaly,c*zsize/clustervalz,a*xsize/clustervalx+xsize/clustervalx,b*ysize/clustervaly+ysize/clustervalz,c*zsize/clustervalz+zsize/clustervalz);
+	         for(int d = 0;d<1;d++){
+	            x=((double)a)*xsize/((double)clustervalx)+((double)rand())/((double)RAND_MAX)*xsize/((double)clustervalx)-xsize/2;
+	            y=((double)b)*ysize/((double)clustervaly)+((double)rand())/((double)RAND_MAX)*ysize/((double)clustervaly)-ysize/2;
+	            z=((double)c)*zsize/((double)clustervalz)+((double)rand())/((double)RAND_MAX)*zsize/((double)clustervalx)-zsize/2;
+	            clusters[a*clustervaly*clustervalz+b*clustervalz+c].
+               particles.push_back(Particle(x+xsize/2,y+ysize/2,z+zsize/2,0,0,0));
+	         }
+         }
       }
-    }
-  }
-
-  Window w (clusters,vfieldx,vfieldy,vfieldz);
-  w.start(args, args1);
+   }
+   Server w (clusters,vfieldx,vfieldy,vfieldz);
+   w.start(args, args1);
 }
