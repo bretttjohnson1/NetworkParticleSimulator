@@ -1,0 +1,22 @@
+#IFIELD is the initial vector field, leave as rand for random values or write functions of x and y
+#VFIELD is the working vector field, it is the same as IFIELD, but it increments the x,y,z velocities by its function value every tick. basically acceleration field
+#SIZE is the dimensions of the rectangular prism in x,y,z that houses the points
+#PARTICLES is the number of particles
+#SPEED is the field that determines how fast the simulation runs, higher speed reduces accuracy
+IFIELDX:rand()/5
+IFIELDY:rand()/5-1
+IFIELDZ:rand()/5
+//VFIELDX:(-y/(x^2+y^2))*10
+//VFIELDY:(x/(x^2+y^2))*10
+VFIELDX:0
+VFIELDY:0
+VFIELDZ:0
+XSIZE:1000
+YSIZE:1000
+ZSIZE:1000
+PARTICLES: 6400
+SPEED:.5
+WRAPX:false
+WRAPY:false
+WRAPZ:false
+END
