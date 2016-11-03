@@ -124,10 +124,10 @@ void init(int width, int height){
 void draw(){
    struct timeval begin,end;
    gettimeofday(&begin, NULL);
-   for(long a = 0;a<numparticles*3;a+=3){
+   long a = 0;
+   while(a < numparticles*3){
+      recv(sockfd,&a,sizeof(long),0);
       recv(sockfd,&buffer[a],sizeof(double),0);
-      recv(sockfd,&buffer[a+1],sizeof(double),0);
-      recv(sockfd,&buffer[a+2],sizeof(double),0);
    }
    gettimeofday(&end,NULL);
    //printf("data recieved in %lu ms\n",end.tv_usec-begin.tv_usec);
