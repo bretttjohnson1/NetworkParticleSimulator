@@ -119,18 +119,19 @@ void Server::start(int argc, char **argv){
 				if(success == -1) {
 					fail((char *)"send length");
 				}
-				/*success = send(newfd, &xsize,sizeof(int),0);
-				   if(success == -1){
-				   fail((char *)"send x");
-				   }
-				   success = send(newfd, &ysize,sizeof(int),0);
-				   if(success == -1){
-				   fail((char *)"send y");
-				   }
-				   success = send(newfd, &zsize,sizeof(int),0);
-				   if(success == -1){
-				   fail((char *)"send z");
-				   }*/
+				success = send(newfd, &xsize,sizeof(double),0);
+				if(success == -1) {
+					fail((char *)"send x");
+				}
+				//printf("%f\n",ysize );
+				success = send(newfd, &ysize,sizeof(double),0);
+				if(success == -1) {
+					fail((char *)"send y");
+				}
+				success = send(newfd, &zsize,sizeof(double),0);
+				if(success == -1) {
+					fail((char *)"send z");
+				}
 				break;
 			}
 
@@ -155,12 +156,12 @@ void Server::start(int argc, char **argv){
 				}
 			}
 			pthread_create(&tid1,&attr1,physics,NULL);
-			for(long a =0; a<numparticles*3; a++){
-            success = send(newfd, &a,sizeof(long),0);
+			for(long a =0; a<numparticles*3; a++) {
+				success = send(newfd, &a,sizeof(long),0);
 				success = send(newfd, data+a,sizeof(double),0);
-         }
-         long end_transmission = numparticles*3;
-         success = send(newfd, &end_transmission,sizeof(long),0);
+			}
+			long end_transmission = numparticles*3;
+			success = send(newfd, &end_transmission,sizeof(long),0);
 			pthread_join(tid1,NULL);
 			//gettimeofday(&end, NULL);
 
@@ -219,11 +220,11 @@ void phys(string gravityx, string gravityy,string gravityz, int quad, Cluster *c
 	if(xbound==0) roundoffx=0;
 	if(ybound==0) roundoffy=0;
 	if(zbound==0) roundoffz=0;
-
 	for(int a = xbound; a<clustervalx/2+xbound+roundoffx; a++) {
 		for(int b = ybound; b<clustervaly/2+ybound+roundoffy; b++) {
 			for(int c = zbound; c<clustervalz/2+zbound+roundoffz; c++) {
 				for(unsigned long d = 0; d<clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.size(); d++) {
+					double mass = clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).mass; //mass of particle whose force is being calculated
 					double forcex=0,forcey=0,forcez=0;
 					for(int i=a-1; i<=a+1; i++) {
 						for(int j=b-1; j<=b+1; j++) {
@@ -234,12 +235,21 @@ void phys(string gravityx, string gravityy,string gravityz, int quad, Cluster *c
 										double disy=clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles.at(l).y-clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).y;
 										double disz=clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles.at(l).z-clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).z;
 										if(!(disx==0 && disy==0 && disz==0)) {
+											double mass2 = clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles.at(l).mass; //mass of other particle
 											double dist = sqrt(disx*disx+disy*disy+disz*disz);
-                                 //double force = (2/(dist*dist+4)-2/((dist-2)*(dist-2)+8));
-                                 double force =-.001;
-											forcex-=force*disx/dist;
-											forcey-=force*disy/dist;
-											forcez-=force*disz/dist;
+											/*if(dist<2) {
+												clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles.at(l).mass+=mass;
+												//Particle tmp = clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles.at(l);
+												clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles[l] = clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles[clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles.size()-1];
+												//clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles[clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles.size()-1] = tmp;
+												clusters[i*clustervaly*clustervalz+j*clustervalz+k].particles.pop_back();
+												break;
+
+											}*/
+											double accel = particle_interaction_function(dist,mass2);
+											forcex-=accel*mass*disx/dist;
+											forcey-=accel*mass*disy/dist;
+											forcez-=accel*mass*disz/dist;
 
 										}
 									}
@@ -251,7 +261,17 @@ void phys(string gravityx, string gravityy,string gravityz, int quad, Cluster *c
 					clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).vy+=forcey;
 					clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).vz+=forcez;
 
-               clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).vy-=.001;
+					clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).vx+=vfield_x(clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).x,
+					                                                                                 clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).y,
+					                                                                                 clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).z);
+
+					clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).vy+=vfield_y(clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).x,
+					                                                                                 clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).y,
+					                                                                                 clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).z);
+
+					clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).vz+=vfield_z(clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).x,
+					                                                                                 clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).y,
+					                                                                                 clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).z);
 
 					//edge checking if wrapxyz=true, particles loop from one side to another
 					//if wrapxyz=false particles bounce off the boundaries
@@ -306,14 +326,14 @@ void phys(string gravityx, string gravityy,string gravityz, int quad, Cluster *c
 	}
 }
 void *physics(void *args){
-	for(int a = 0; a<clustervalx; a++)
-		for(int b = 0; b<clustervaly; b++)
-			for(int c =0; c<clustervalz; c++)
+	for(int a = 0; a<clustervalx; a++) {
+		for(int b = 0; b<clustervaly; b++) {
+			for(int c =0; c<clustervalz; c++) {
 				for(unsigned long d = 0; d<clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.size(); d++) {
 					int clusterx = clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).x/xsize*clustervalx;
 					int clustery = clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).y/ysize*clustervaly;
 					int clusterz = clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.at(d).z/zsize*clustervalz;
-					if(clusterx<clustervalx && clustery<clustervaly && clusterz<clustervalz && clusterx>=0 && clustery>=0 && clusterz>=0)
+					if(clusterx<clustervalx && clustery<clustervaly && clusterz<clustervalz && clusterx>=0 && clustery>=0 && clusterz>=0) {
 						if(clusterx!=a ||clustery!=b || clusterz!=c) {
 							clusters[clusterx*clustervaly*clustervalz+clustery*clustervalz+clusterz].particles.push_back(clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles[d]);
 							Particle tmp = clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles[d];
@@ -322,7 +342,11 @@ void *physics(void *args){
 							clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.pop_back();
 							d--;
 						}
+					}
 				}
+			}
+		}
+	}
 
 
 

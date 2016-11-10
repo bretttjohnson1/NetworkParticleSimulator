@@ -12,6 +12,7 @@
 #include <math.h>
 #include <fstream>
 #include "globals.hpp"
+#include "vfunctions.h"
 using namespace std;
 double xsize,ysize,zsize;
 int particles;
@@ -140,7 +141,7 @@ int main(int args, char **args1){
 	            y=((double)b)*ysize/((double)clustervaly)+((double)rand())/((double)RAND_MAX)*ysize/((double)clustervaly)-ysize/2;
 	            z=((double)c)*zsize/((double)clustervalz)+((double)rand())/((double)RAND_MAX)*zsize/((double)clustervalx)-zsize/2;
 	            clusters[a*clustervaly*clustervalz+b*clustervalz+c].
-               particles.push_back(Particle(x+xsize/2,y+ysize/2,z+zsize/2,0,0,0));
+               particles.push_back(Particle(x+xsize/2,y+ysize/2,z+zsize/2,0,0,0,mass_function(x,y,z)));
 	         }
          }
       }

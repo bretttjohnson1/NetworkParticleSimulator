@@ -24,7 +24,7 @@ float thet=0;
 int window;
 long numparticles = 0;
 int sockfd = 0;
-int xsize = 1000;int ysize = 1000;int zsize = 1000;
+double xsize = 1000;double ysize = 1000;double zsize = 1000;
 double *buffer;
 
 void fail(){
@@ -93,19 +93,19 @@ void client_init(int argc, char **argv){
    if(success==-1){
       fail();
    }
-   /*success = recv(sockfd,&xsize,sizeof(int),0);
+   success = recv(sockfd,&xsize,sizeof(double),0);
    if(success==-1){
       fail();
    }
-   success = recv(sockfd,&ysize,sizeof(int),0);
+   success = recv(sockfd,&ysize,sizeof(double),0);
    if(success==-1){
       fail();
    }
-   success = recv(sockfd,&zsize,sizeof(int),0);
+   success = recv(sockfd,&zsize,sizeof(double),0);
    if(success==-1){
       fail();
-   }*/
-   printf("%d\n",ysize );
+   }
+   printf("%f\n",ysize );
    buffer = (double *)malloc(numparticles*3*sizeof(double));
 
 }
