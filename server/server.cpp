@@ -25,7 +25,7 @@
 #include <pthread.h>
 #include "server.hpp"
 #include "globals.hpp"
-#include "vfunctions.h"
+#include "vfunctions.hpp"
 
 #define ESCAPE 27
 #define KEY_W 119

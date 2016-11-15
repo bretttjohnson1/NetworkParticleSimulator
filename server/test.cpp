@@ -12,7 +12,7 @@
 #include <math.h>
 #include <fstream>
 #include "globals.hpp"
-#include "vfunctions.h"
+#include "vfunctions.hpp"
 using namespace std;
 double xsize,ysize,zsize;
 int particles;

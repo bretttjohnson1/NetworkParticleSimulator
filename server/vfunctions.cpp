@@ -1,6 +1,8 @@
-#include <stdio.h>
+//#include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+using namespace std;
+
 
 double particle_interaction_function(double dist,double mass){
 

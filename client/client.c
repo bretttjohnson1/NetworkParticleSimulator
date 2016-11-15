@@ -29,6 +29,7 @@ double *buffer;
 
 void fail(){
    printf("Error %s \n",strerror(errno));
+   fflush(stdout);
    exit(1);
 }
 
@@ -82,17 +83,20 @@ void client_init(int argc, char **argv){
    hints.ai_socktype = SOCK_STREAM;
    hints.ai_flags = AI_PASSIVE;
    status = getaddrinfo(address, port, &hints,&serverinfo);
-
+   if(status != 0)
+      fail();
    sockfd = socket(serverinfo->ai_family,serverinfo->ai_socktype,serverinfo->ai_protocol);
    int success = connect(sockfd,serverinfo->ai_addr,serverinfo->ai_addrlen);
    if(success!=0){
       fail();
    }
-
+   printf("cleared");
    success = recv(sockfd,&numparticles,4,0);
    if(success==-1){
       fail();
    }
+   printf("cleared");
+   fflush(stdout);
    success = recv(sockfd,&xsize,sizeof(double),0);
    if(success==-1){
       fail();
