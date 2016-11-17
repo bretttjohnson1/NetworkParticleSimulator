@@ -71,14 +71,14 @@ void Server::start(int argc, char **argv){
 	}
 	char *port = argv[1];
 
-	long numparticles = 0;
+	int numparticles = 0;
 	for(int a = 0; a<clustervalx; a++)
 		for(int b = 0; b<clustervaly; b++)
 			for(int c =0; c<clustervalz; c++)
 				for(unsigned long d = 0; d<clusters[a*clustervaly*clustervalz+b*clustervalz+c].particles.size(); d++) {
 					numparticles++;
 				}
-	printf("%ld\n",numparticles );
+	printf("%d\n",numparticles );
 
 	int status;
 	struct addrinfo hints;
@@ -99,7 +99,9 @@ void Server::start(int argc, char **argv){
 		perror("setsockopt");
 		exit(1);
 	}
-	bind(sockfd, serverinfo->ai_addr,serverinfo->ai_addrlen);
+	if(::bind(sockfd, serverinfo->ai_addr,serverinfo->ai_addrlen) == -1){
+      fail((char *)"Bind Error");
+   }
 	listen(sockfd, 5);
 	struct sockaddr_storage their_addr;
 	socklen_t addr_size;
@@ -156,12 +158,12 @@ void Server::start(int argc, char **argv){
 				}
 			}
 			pthread_create(&tid1,&attr1,physics,NULL);
-			for(long a =0; a<numparticles*3; a++) {
-				success = send(newfd, &a,sizeof(long),0);
+			for(int a =0; a<numparticles*3; a++) {
+				success = send(newfd, &a,4,0);
 				success = send(newfd, data+a,sizeof(double),0);
 			}
-			long end_transmission = numparticles*3;
-			success = send(newfd, &end_transmission,sizeof(long),0);
+			int end_transmission = numparticles*3;
+			success = send(newfd, &end_transmission,sizeof(int),0);
 			pthread_join(tid1,NULL);
 			//gettimeofday(&end, NULL);
 

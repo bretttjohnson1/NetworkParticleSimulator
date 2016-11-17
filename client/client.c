@@ -22,7 +22,7 @@ char keys[256];
 float phi=0;
 float thet=0;
 int window;
-long numparticles = 0;
+int numparticles = 0;
 int sockfd = 0;
 double xsize = 1000;double ysize = 1000;double zsize = 1000;
 double *buffer;
@@ -109,7 +109,8 @@ void client_init(int argc, char **argv){
    if(success==-1){
       fail();
    }
-   printf("%f\n",ysize );
+   printf("\n %f \n", zsize );
+   printf("%d\n",numparticles );
    buffer = (double *)malloc(numparticles*3*sizeof(double));
 
 }
@@ -126,14 +127,15 @@ void init(int width, int height){
 }
 
 void draw(){
-   struct timeval begin,end;
-   gettimeofday(&begin, NULL);
-   long a = 0;
+   //struct timeval begin,end;
+   //gettimeofday(&begin, NULL);
+   int a = 0;
    while(a < numparticles*3){
-      recv(sockfd,&a,sizeof(long),0);
+      recv(sockfd,&a,sizeof(int),0);
+      if(a==numparticles*3)break;
       recv(sockfd,&buffer[a],sizeof(double),0);
    }
-   gettimeofday(&end,NULL);
+   ///gettimeofday(&end,NULL);
    //printf("data recieved in %lu ms\n",end.tv_usec-begin.tv_usec);
    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
    glLoadIdentity();
@@ -146,13 +148,13 @@ void draw(){
    glRotatef(thet,0,1,0);
    glColor3f(0,255,0);
 
-   gettimeofday(&begin, NULL);
+   //gettimeofday(&begin, NULL);
    for(long a = 0;a<numparticles*3;a+=3){
       glBegin(GL_POINTS);
       glVertex3f(buffer[a]-xsize/2,buffer[a+1]-ysize/2,buffer[a+2]-zsize/2);
       glEnd();
     }
-    gettimeofday(&end,NULL);
+    //gettimeofday(&end,NULL);
    //printf("points drawn in %lu ms\n",end.tv_usec-begin.tv_usec);
 
 
