@@ -195,7 +195,7 @@ int main(int argc, char **argv){
    glutInit(&a,argv);
    glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_ALPHA | GLUT_DEPTH);
    glutInitWindowSize(640,480);
-   window = glutCreateWindow("penor XDDDD");
+   window = glutCreateWindow("Network Particle Simulator");
    glutDisplayFunc(&draw);
    glutIdleFunc(&draw);
    glutFullScreen();
